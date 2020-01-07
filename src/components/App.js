@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Route, Switch } from "react-router-dom";
-
+import{ ipcRenderer } from "electron";
 import Header from "./Header";
 import TasksIndex from "./TasksIndex";
 import TasksShow from "./TasksShow";
@@ -35,25 +35,22 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = APP_DATA || INITIAL_STATE;
-
     this.onAppClose();
   }
 
-  // --------------------------------------------------
   // -------- electron event handlers -----------------
-  // --------------------------------------------------
 
   onAppClose = () => {
 
   };
 
   updateTrayText = title => {
-
+    ipcRenderer.send("update-timer", title);
   };
 
   timerHasExpired = () => {
-
-  };
+    ipcRenderer.send("update-timer", "")
+  };//clear timer once done
 
   // -------- end of electron event handerls ----------
 
@@ -92,7 +89,6 @@ class App extends Component {
         }
       };
     });
-
     // handler for electron tray title
     this.updateTrayText(newDisplay);
   };

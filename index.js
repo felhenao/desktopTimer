@@ -1,20 +1,21 @@
 const path = require('path');
 const electron = require('electron');
-const { app, BrowserWindow, Tray } = electron;
+const { app, ipcMain } = electron;
 const TimerTray = require('./app/timerTray');
+const MainWindow = require('./app/mainWindow');
 let mainWindow;
+let tray;
 
 app.on('ready', () => {
-    mainWindow = new BrowserWindow ({
-        height: 430,
-        width: 230,
-        frame: false,
-        resizable: false,
-        show: false
-    });
-    mainWindow.loadURL(`file://${__dirname}/src/index.html`);//create window when the app is ready
-
-    const iconName = process.platform == 'win32' ? 'windows-icon.png' : 'iconTemplate.png'
+    app.dock.hide();//keep it from showing in the dock
+    mainWindow = new MainWindow();
+    mainWindow.loadURL(`file://${__dirname}/src/index.html`);
+  
+    const iconName = process.platform == 'win32' ? 'windows-icon.png' : 'iconTemplate.png';
     const iconPath = path.join(__dirname, `./src/assets/${iconName}`);//generate a correct path based on the runing operating system
-    new TimerTray(iconPath, mainWindow);
+    tray = new TimerTray(iconPath, mainWindow);
+});
+
+ipcMain.on('update-timer', (event, timeLeft) => {
+    tray.setTitle(timeLeft);
 });
